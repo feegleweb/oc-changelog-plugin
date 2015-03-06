@@ -1,0 +1,13 @@
+<div class="report-widget">
+    <h3><?= e(trans($this->property('title'))) ?></h3>
+
+    <?php if (!isset($error)): ?>
+        <p>
+            <strong>Installed build:</strong> <?= $current ?>
+            (behind by <?= $behind ?> release<?= $behind === 1 ? '' : 's' ?>)
+        </p>
+        <?= $detail ?>
+    <?php else: ?>
+        <p class="flash-message static warning"><?= e($error) ?></p>
+    <?php endif ?>
+</div>
