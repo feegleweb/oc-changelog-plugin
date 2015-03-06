@@ -3,8 +3,8 @@
 
     <?php if (!isset($error)): ?>
         <p>
-            <strong>Installed build:</strong>
-             <?= $current ?> (behind by <?= $behind ?> releases)
+            <strong>Installed build:</strong> <?= $current ?>
+            (behind by <?= $behind ?> release<?= $behind === 1 ? '' : 's' ?>)
         </p>
         <?= $detail ?>
     <?php else: ?>
