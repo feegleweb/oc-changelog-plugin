@@ -38,12 +38,20 @@ class Changelog extends ReportWidgetBase
         $this->loadBuildNum();
         $this->loadChangelog();
 
+        $this->vars['current'] = $this->build;
+        $this->vars['behind'] = $this->countBuildsBehind();
+
         $this->vars['detail'] = Markdown::parse($this->changelog);
     }
 
     protected function loadBuildNum()
     {
         $this->build = Parameters::get('system::core.build');
+    }
+
+    protected function countBuildsBehind()
+    {
+        return substr_count($this->changelog, '* **Build ');
     }
 
     protected function loadChangelog()
