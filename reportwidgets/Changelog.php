@@ -1,8 +1,7 @@
 <?php namespace Feegleweb\Changelog\ReportWidgets;
 
 use GuzzleHttp\Client;
-use October\Rain\Support\Markdown; // Beta
-// use Markdown; // RC
+use Markdown;
 use Backend\Classes\ReportWidgetBase;
 use System\Models\Parameters;
 
