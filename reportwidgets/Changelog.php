@@ -4,6 +4,7 @@ use GuzzleHttp\Client;
 use October\Rain\Support\Markdown; // Beta
 // use Markdown; // RC
 use Backend\Classes\ReportWidgetBase;
+use System\Models\Parameters;
 
 class Changelog extends ReportWidgetBase
 {
@@ -34,11 +35,42 @@ class Changelog extends ReportWidgetBase
 
     public function loadData()
     {
+        $this->loadBuildNum();
+        $this->loadChangelog();
+
+        $this->vars['detail'] = Markdown::parse($this->changelog);
+    }
+
+    protected function loadBuildNum()
+    {
+        $this->build = Parameters::get('system::core.build');
+    }
+
+    protected function loadChangelog()
+    {
         $uri = 'https://raw.githubusercontent.com/octobercms/october/master/CHANGELOG.md';
 
-        $client = new Client();
-        $response = $client->get($uri);
+        $response = (new Client())->get($uri);
 
-        $this->vars['changes'] = Markdown::parse($response->getBody());
+        $this->changelog = $this->slice($response->getBody());
+    }
+
+    protected function slice($data)
+    {
+        $build = $this->build;
+        $foundBuild = false;
+
+        // Build 64 was the first public release, so don't go past it
+        while (!$foundBuild && $build >= 64) {
+            $pos = strpos($data, "* **Build {$build}**");
+
+            $pos === false ? $build-- : $foundBuild = true;
+        }
+
+        if (!$foundBuild) {
+            throw new Exception("Unable to slice changelog, build {$this->build} not found.");
+        }
+
+        return substr($data, 0, $pos);
     }
 }

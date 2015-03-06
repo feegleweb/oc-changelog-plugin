@@ -2,7 +2,7 @@
     <h3><?= e(trans($this->property('title'))) ?></h3>
 
     <?php if (!isset($error)): ?>
-        <?= $changes ?>
+        <?= $detail ?>
     <?php else: ?>
         <p class="flash-message static warning"><?= e($error) ?></p>
     <?php endif ?>
