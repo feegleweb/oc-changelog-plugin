@@ -35,6 +35,7 @@ class Changelog extends ReportWidgetBase
 
     public function loadData()
     {
+        $this->checkPermissions();
         $this->loadBuildNum();
         $this->loadChangelog();
 
@@ -42,6 +43,15 @@ class Changelog extends ReportWidgetBase
         $this->vars['behind'] = $this->countBuildsBehind();
 
         $this->vars['detail'] = Markdown::parse($this->changelog);
+    }
+
+    protected function checkPermissions()
+    {
+        if ($this->controller->user->hasAccess('system.manage_updates')) {
+            return;
+        }
+
+        throw new Exception("You don't have permission to manage updates");
     }
 
     protected function loadBuildNum()
