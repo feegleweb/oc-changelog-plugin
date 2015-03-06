@@ -17,9 +17,9 @@ class Plugin extends PluginBase
     {
         return [
             'name'        => 'Changelog',
-            'description' => 'No description provided yet...',
-            'author'      => 'Feegleweb',
-            'icon'        => 'icon-leaf'
+            'description' => 'Adds a report widget to show the October CMS changelog on the dashboard.',
+            'author'      => 'Dave Shoreman',
+            'icon'        => 'icon-list-alt'
         ];
     }
 
