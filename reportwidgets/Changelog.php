@@ -1,8 +1,8 @@
 <?php namespace Feegleweb\Changelog\ReportWidgets;
 
-use GuzzleHttp\Client;
 use Markdown;
 use Backend\Classes\ReportWidgetBase;
+use October\Rain\Network\Http;
 use System\Models\Parameters;
 
 class Changelog extends ReportWidgetBase
@@ -67,9 +67,7 @@ class Changelog extends ReportWidgetBase
     {
         $uri = 'https://raw.githubusercontent.com/octobercms/october/master/CHANGELOG.md';
 
-        $response = (new Client())->get($uri);
-
-        $this->changelog = $this->slice($response->getBody());
+        $this->changelog = $this->slice(Http::get($uri));
     }
 
     protected function slice($data)
@@ -77,6 +75,7 @@ class Changelog extends ReportWidgetBase
         $build = $this->build;
         $foundBuild = false;
 
+        // Find the nearest older build to the current one, not all are on changelog.
         // Build 64 was the first public release, so don't go past it
         while (!$foundBuild && $build >= 64) {
             $pos = strpos($data, "* **Build {$build}**");
