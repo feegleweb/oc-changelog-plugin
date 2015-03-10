@@ -75,6 +75,7 @@ class Changelog extends ReportWidgetBase
         $build = $this->build;
         $foundBuild = false;
 
+        // Find the nearest older build to the current one, not all are on changelog.
         // Build 64 was the first public release, so don't go past it
         while (!$foundBuild && $build >= 64) {
             $pos = strpos($data, "* **Build {$build}**");
