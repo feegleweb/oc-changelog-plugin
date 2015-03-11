@@ -4,6 +4,9 @@ use Markdown;
 use Backend\Classes\ReportWidgetBase;
 use October\Rain\Network\Http;
 use System\Models\Parameters;
+use ApplicationException;
+use SystemException;
+use Exception;
 
 class Changelog extends ReportWidgetBase
 {
@@ -50,7 +53,7 @@ class Changelog extends ReportWidgetBase
             return;
         }
 
-        throw new Exception("You don't have permission to manage updates");
+        throw new ApplicationException("You don't have permission to manage updates");
     }
 
     protected function loadBuildNum()
@@ -67,7 +70,11 @@ class Changelog extends ReportWidgetBase
     {
         $uri = 'https://raw.githubusercontent.com/octobercms/october/master/CHANGELOG.md';
 
-        $this->changelog = $this->slice(Http::get($uri));
+        if (($log = Http::get($uri)) == '') {
+            throw new SystemException("Could not load changelog from {$uri}");
+        }
+
+        $this->changelog = $this->slice($log);
     }
 
     protected function slice($data)
@@ -84,7 +91,7 @@ class Changelog extends ReportWidgetBase
         }
 
         if (!$foundBuild) {
-            throw new Exception("Unable to slice changelog, build {$this->build} not found.");
+            throw new ApplicationException("Unable to slice changelog, build {$this->build} not found.");
         }
 
         return substr($data, 0, $pos);
