@@ -32,6 +32,14 @@ class Changelog extends ReportWidgetBase
                 'validationPattern' => '^.+$',
                 'validationMessage' => 'backend::lang.dashboard.widget_title_error',
             ],
+            'recentLogs' => [
+                'title'             => 'Recent logs',
+                'description'       => 'When the system is up to date, this sets how many recent logs are displayed.',
+                'default'           => 5,
+                'type'              => 'string',
+                'validationPattern' => '^[0-9]+$',
+                'validationMessage' => 'Recent logs must be a positive number',
+            ],
         ];
     }
 
@@ -44,7 +52,9 @@ class Changelog extends ReportWidgetBase
         $this->vars['current'] = $this->build;
         $this->vars['behind'] = $this->countBuildsBehind();
 
-        $this->vars['detail'] = Markdown::parse($this->changelog);
+        $log = $this->changelog['precise'] ?: $this->changelog['recent'];
+
+        $this->vars['detail'] = Markdown::parse($log);
     }
 
     protected function checkPermissions()
@@ -63,7 +73,7 @@ class Changelog extends ReportWidgetBase
 
     protected function countBuildsBehind()
     {
-        return substr_count($this->changelog, '* **Build ');
+        return substr_count($this->changelog['precise'], '* **Build ');
     }
 
     protected function loadChangelog()
@@ -74,10 +84,13 @@ class Changelog extends ReportWidgetBase
             throw new SystemException("Could not load changelog from {$uri}");
         }
 
-        $this->changelog = $this->slice($log);
+        $this->changelog = [
+            'precise' => $this->slicePrecise($log),
+            'recent'  => $this->sliceRecent($log),
+        ];
     }
 
-    protected function slice($data)
+    protected function slicePrecise($data)
     {
         $build = $this->build;
         $foundBuild = false;
@@ -92,6 +105,29 @@ class Changelog extends ReportWidgetBase
 
         if (!$foundBuild) {
             throw new ApplicationException("Unable to slice changelog, build {$this->build} not found.");
+        }
+
+        return substr($data, 0, $pos);
+    }
+
+    protected function sliceRecent($data)
+    {
+        $allBuilds  = substr_count($data, "* **Build ");
+        $showBuilds = $this->property('recentLogs');
+        $entryCount = 0;
+
+        // Don't bother slicing if they want everything
+        if ((int)$showBuilds >= $allBuilds) {
+            return $data;
+        }
+
+        while ($entryCount <= $showBuilds) {
+            $offset = isset($pos) ? $pos + 1 : 0;
+            $pos = strpos($data, "* **Build ", $offset);
+
+            if ($pos !== false) {
+                $entryCount++;
+            }
         }
 
         return substr($data, 0, $pos);
