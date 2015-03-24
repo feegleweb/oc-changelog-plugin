@@ -1,5 +1,6 @@
 <?php namespace Feegleweb\Changelog\ReportWidgets;
 
+use Lang;
 use Markdown;
 use Backend\Classes\ReportWidgetBase;
 use October\Rain\Network\Http;
@@ -27,10 +28,18 @@ class Changelog extends ReportWidgetBase
         return [
             'title' => [
                 'title'             => 'backend::lang.dashboard.widget_title_label',
-                'default'           => 'System changes',
+                'default'           => 'feegleweb.changelog::lang.log.widget_title',
                 'type'              => 'string',
                 'validationPattern' => '^.+$',
                 'validationMessage' => 'backend::lang.dashboard.widget_title_error',
+            ],
+            'recentLogs' => [
+                'title'             => 'feegleweb.changelog::lang.recentLogs.label',
+                'description'       => 'feegleweb.changelog::lang.recentLogs.description',
+                'default'           => 5,
+                'type'              => 'string',
+                'validationPattern' => '^[0-9]+$',
+                'validationMessage' => 'feegleweb.changelog::lang.recentLogs.validation_message',
             ],
         ];
     }
@@ -44,7 +53,9 @@ class Changelog extends ReportWidgetBase
         $this->vars['current'] = $this->build;
         $this->vars['behind'] = $this->countBuildsBehind();
 
-        $this->vars['detail'] = Markdown::parse($this->changelog);
+        $log = $this->changelog['precise'] ?: $this->changelog['recent'];
+
+        $this->vars['detail'] = Markdown::parse($log);
     }
 
     protected function checkPermissions()
@@ -53,7 +64,7 @@ class Changelog extends ReportWidgetBase
             return;
         }
 
-        throw new ApplicationException("You don't have permission to manage updates");
+        throw new ApplicationException(Lang::get('feegleweb.changelog::lang.app.permission_error'));
     }
 
     protected function loadBuildNum()
@@ -63,21 +74,25 @@ class Changelog extends ReportWidgetBase
 
     protected function countBuildsBehind()
     {
-        return substr_count($this->changelog, '* **Build ');
+        return substr_count($this->changelog['precise'], '* **Build ');
     }
 
     protected function loadChangelog()
     {
         $uri = 'https://raw.githubusercontent.com/octobercms/october/master/CHANGELOG.md';
 
-        if (($log = Http::get($uri)) == '') {
-            throw new SystemException("Could not load changelog from {$uri}");
+        $log = Http::get($uri);
+        if ($log == '' || $log->code !== 200) {
+            throw new SystemException(sprintf(Lang::get('feegleweb.changelog::lang.log.load_error'), $uri));
         }
 
-        $this->changelog = $this->slice($log);
+        $this->changelog = [
+            'precise' => $this->slicePrecise($log),
+            'recent'  => $this->sliceRecent($log),
+        ];
     }
 
-    protected function slice($data)
+    protected function slicePrecise($data)
     {
         $build = $this->build;
         $foundBuild = false;
@@ -91,7 +106,32 @@ class Changelog extends ReportWidgetBase
         }
 
         if (!$foundBuild) {
-            throw new ApplicationException("Unable to slice changelog, build {$this->build} not found.");
+            throw new ApplicationException(
+                sprintf(Lang::get('feegleweb.changelog::lang.log.slice_error'), $this->build)
+            );
+        }
+
+        return substr($data, 0, $pos);
+    }
+
+    protected function sliceRecent($data)
+    {
+        $allBuilds  = substr_count($data, "* **Build ");
+        $showBuilds = $this->property('recentLogs');
+        $entryCount = 0;
+
+        // Don't bother slicing if they want everything
+        if ((int)$showBuilds >= $allBuilds) {
+            return $data;
+        }
+
+        while ($entryCount <= $showBuilds) {
+            $offset = isset($pos) ? $pos + 1 : 0;
+            $pos = strpos($data, "* **Build ", $offset);
+
+            if ($pos !== false) {
+                $entryCount++;
+            }
         }
 
         return substr($data, 0, $pos);
