@@ -1,5 +1,6 @@
 <?php namespace Feegleweb\Changelog\ReportWidgets;
 
+use Lang;
 use Markdown;
 use Backend\Classes\ReportWidgetBase;
 use October\Rain\Network\Http;
@@ -27,18 +28,18 @@ class Changelog extends ReportWidgetBase
         return [
             'title' => [
                 'title'             => 'backend::lang.dashboard.widget_title_label',
-                'default'           => 'System changes',
+                'default'           => 'feegleweb.changelog::lang.log.widget_title',
                 'type'              => 'string',
                 'validationPattern' => '^.+$',
                 'validationMessage' => 'backend::lang.dashboard.widget_title_error',
             ],
             'recentLogs' => [
-                'title'             => 'Recent logs',
-                'description'       => 'When the system is up to date, this sets how many recent logs are displayed.',
+                'title'             => 'feegleweb.changelog::lang.recentLogs.label',
+                'description'       => 'feegleweb.changelog::lang.recentLogs.description',
                 'default'           => 5,
                 'type'              => 'string',
                 'validationPattern' => '^[0-9]+$',
-                'validationMessage' => 'Recent logs must be a positive number',
+                'validationMessage' => 'feegleweb.changelog::lang.recentLogs.validation_message',
             ],
         ];
     }
@@ -63,7 +64,7 @@ class Changelog extends ReportWidgetBase
             return;
         }
 
-        throw new ApplicationException("You don't have permission to manage updates");
+        throw new ApplicationException(Lang::get('feegleweb.changelog::lang.app.permission_error'));
     }
 
     protected function loadBuildNum()
@@ -81,9 +82,8 @@ class Changelog extends ReportWidgetBase
         $uri = 'https://raw.githubusercontent.com/octobercms/october/master/CHANGELOG.md';
 
         $log = Http::get($uri);
-
         if ($log == '' || $log->code !== 200) {
-            throw new SystemException("Could not load changelog from {$uri}");
+            throw new SystemException(sprintf(Lang::get('feegleweb.changelog::lang.log.load_error'), $uri));
         }
 
         $this->changelog = [
@@ -106,7 +106,9 @@ class Changelog extends ReportWidgetBase
         }
 
         if (!$foundBuild) {
-            throw new ApplicationException("Unable to slice changelog, build {$this->build} not found.");
+            throw new ApplicationException(
+                sprintf(Lang::get('feegleweb.changelog::lang.log.slice_error'), $this->build)
+            );
         }
 
         return substr($data, 0, $pos);
