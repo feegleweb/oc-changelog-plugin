@@ -80,7 +80,9 @@ class Changelog extends ReportWidgetBase
     {
         $uri = 'https://raw.githubusercontent.com/octobercms/october/master/CHANGELOG.md';
 
-        if (($log = Http::get($uri)) == '') {
+        $log = Http::get($uri);
+
+        if ($log == '' || $log->code !== 200) {
             throw new SystemException("Could not load changelog from {$uri}");
         }
 
