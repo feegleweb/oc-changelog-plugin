@@ -1,4 +1,4 @@
-# Changelog report widget for October CMS
+# Changelog report widget for OctoberCMS
 
 Changelog is a small plugin that does what it says on the tin.
 It adds a list of what's changed to your Dashboard in the October backend,

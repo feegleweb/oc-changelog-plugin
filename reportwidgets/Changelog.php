@@ -11,7 +11,6 @@ use Exception;
 
 class Changelog extends ReportWidgetBase
 {
-
     public function render()
     {
         try {
@@ -31,7 +30,7 @@ class Changelog extends ReportWidgetBase
                 'default'           => 'feegleweb.changelog::lang.log.widget_title',
                 'type'              => 'string',
                 'validationPattern' => '^.+$',
-                'validationMessage' => 'backend::lang.dashboard.widget_title_error',
+                'validationMessage' => 'backend::lang.dashboard.widget_title_error'
             ],
             'recentLogs' => [
                 'title'             => 'feegleweb.changelog::lang.recentLogs.label',
@@ -39,8 +38,8 @@ class Changelog extends ReportWidgetBase
                 'default'           => 5,
                 'type'              => 'string',
                 'validationPattern' => '^[0-9]+$',
-                'validationMessage' => 'feegleweb.changelog::lang.recentLogs.validation_message',
-            ],
+                'validationMessage' => 'feegleweb.changelog::lang.recentLogs.validation_message'
+            ]
         ];
     }
 
@@ -98,7 +97,7 @@ class Changelog extends ReportWidgetBase
         $foundBuild = false;
 
         // Find the nearest older build to the current one, not all are on changelog.
-        // Build 64 was the first public release, so don't go past it
+        // Build 64 was the first public release, so don't go past it.
         while (!$foundBuild && $build >= 64) {
             $pos = strpos($data, "* **Build {$build}**");
 
@@ -120,7 +119,7 @@ class Changelog extends ReportWidgetBase
         $showBuilds = $this->property('recentLogs');
         $entryCount = 0;
 
-        // Don't bother slicing if they want everything
+        // Don't bother slicing if they want everything.
         if ((int)$showBuilds >= $allBuilds) {
             return $data;
         }
