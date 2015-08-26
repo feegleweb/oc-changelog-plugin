@@ -19,7 +19,8 @@ class Plugin extends PluginBase
             'name'        => 'Changelog',
             'description' => 'Adds a report widget to show the October CMS changelog on the dashboard.',
             'author'      => 'Dave Shoreman',
-            'icon'        => 'icon-list-alt'
+            'icon'        => 'icon-list-alt',
+            'homepage'    => 'https://github.com/feegleweb/oc-changelog-plugin',
         ];
     }
 
