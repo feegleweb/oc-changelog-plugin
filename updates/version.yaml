@@ -2,3 +2,4 @@
 1.0.2: Remove dependency on Guzzle\HttpClient
 1.0.3: Improve error handling
 1.1.0: Localisation and up-to-date fallback support
+1.1.1: Minor tweaks and localisation

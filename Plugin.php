@@ -7,19 +7,18 @@ use System\Classes\PluginBase;
  */
 class Plugin extends PluginBase
 {
-
     /**
      * Returns information about this plugin.
-     *
      * @return array
      */
     public function pluginDetails()
     {
         return [
-            'name'        => 'Changelog',
-            'description' => 'Adds a report widget to show the October CMS changelog on the dashboard.',
+            'name'        => 'feegleweb.changelog::lang.plugin.name',
+            'description' => 'feegleweb.changelog::lang.plugin.description',
             'author'      => 'Dave Shoreman',
-            'icon'        => 'icon-list-alt'
+            'icon'        => 'icon-list-alt',
+            'homepage'    => 'https://github.com/feegleweb/oc-changelog-plugin',
         ];
     }
 
@@ -27,7 +26,7 @@ class Plugin extends PluginBase
     {
         return [
             'Feegleweb\Changelog\ReportWidgets\Changelog' => [
-                'label'   => 'System changes',
+                'label'   => 'feegleweb.changelog::lang.log.widget_title',
                 'context' => 'dashboard',
             ],
         ];

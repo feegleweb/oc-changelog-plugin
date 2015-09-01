@@ -1,6 +1,10 @@
 <?php
 
 return [
+    'plugin' => [
+        'name'               => "Changelog",
+        'description'        => "Adds a report widget to show the October CMS changelog on the dashboard.",
+    ],
     'app' => [
         'permission_error'   => "You don't have permission to manage updates",
     ],
