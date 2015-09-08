@@ -2,6 +2,7 @@
 
 use Lang;
 use Markdown;
+use BackendAuth;
 use Backend\Classes\ReportWidgetBase;
 use October\Rain\Network\Http;
 use System\Models\Parameters;
@@ -60,7 +61,7 @@ class Changelog extends ReportWidgetBase
 
     protected function checkPermissions()
     {
-        if ($this->controller->user->hasAccess('system.manage_updates')) {
+        if (BackendAuth::getUser()->hasAccess('system.manage_updates')) {
             return;
         }
 
