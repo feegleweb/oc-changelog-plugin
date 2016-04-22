@@ -80,7 +80,9 @@ class Changelog extends ReportWidgetBase
 
     protected function loadChangelog()
     {
-        $uri = 'https://raw.githubusercontent.com/octobercms/october/master/CHANGELOG.md';
+        // The changelog in Github is deprecated. Next update will remove it entirely.
+        // Let's freeze history for now, until there's a json stream on the October website.
+        $uri = 'https://raw.githubusercontent.com/octobercms/october/9dc1b4d836c8147f7fc0b3f752efe10d70a491f2/CHANGELOG.md';
 
         $log = Http::get($uri);
         if ($log == '' || $log->code !== 200) {
